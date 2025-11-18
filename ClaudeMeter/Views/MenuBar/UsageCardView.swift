@@ -1,0 +1,112 @@
+//
+//  UsageCardView.swift
+//  ClaudeMeter
+//
+//  Created by Edd on 2025-11-14.
+//
+
+import SwiftUI
+
+/// Reusable usage card component
+struct UsageCardView: View {
+    let title: String
+    let usageLimit: UsageLimit
+    let icon: String
+    let timezone: TimeZone
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Header with icon and title
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundColor(usageLimit.status.color)
+
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.primary)
+
+                Spacer()
+
+                // Status badge
+                HStack(spacing: 4) {
+                    Image(systemName: usageLimit.status.iconName)
+                        .font(.caption)
+                    Text(usageLimit.status.rawValue.capitalized)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                }
+                .foregroundColor(usageLimit.status.color)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(usageLimit.status.color.opacity(0.15))
+                .cornerRadius(8)
+            }
+
+            // Usage percentage
+            Text("\(Int(usageLimit.percentage))%")
+                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .foregroundColor(usageLimit.status.color)
+
+            // Progress bar
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    // Background
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.gray.opacity(0.2))
+
+                    // Progress
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(usageLimit.status.color)
+                        .frame(width: geometry.size.width * min(usageLimit.percentage / 100, 1.0))
+                }
+            }
+            .frame(height: 8)
+
+            // Reset time
+            HStack(spacing: 4) {
+                Image(systemName: "clock")
+                    .font(.caption)
+                Text("Resets \(usageLimit.resetDescription(in: timezone))")
+                    .font(.caption)
+            }
+            .foregroundColor(.secondary)
+        }
+        .padding(16)
+        .background(Color(nsColor: .controlBackgroundColor))
+        .cornerRadius(12)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title): \(Int(usageLimit.percentage))% used, \(usageLimit.status.accessibilityDescription)")
+        .accessibilityValue("Resets \(usageLimit.resetDescription(in: timezone))")
+    }
+}
+
+// MARK: - Preview
+
+#Preview {
+    VStack(spacing: 16) {
+        UsageCardView(
+            title: "5-Hour Session",
+            usageLimit: UsageLimit(
+                tokensUsed: 35000,
+                tokensLimit: 100000,
+                resetAt: Date().addingTimeInterval(7200)
+            ),
+            icon: "gauge.with.dots.needle.67percent",
+            timezone: .current
+        )
+
+        UsageCardView(
+            title: "Weekly Usage",
+            usageLimit: UsageLimit(
+                tokensUsed: 750000,
+                tokensLimit: 1000000,
+                resetAt: Date().addingTimeInterval(86400 * 3)
+            ),
+            icon: "calendar",
+            timezone: .current
+        )
+    }
+    .padding()
+    .frame(width: 320)
+}
