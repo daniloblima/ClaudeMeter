@@ -53,13 +53,13 @@ struct SettingsView: View {
                             .fixedSize(horizontal: false, vertical: true)
 
                         HStack {
-                            if viewModel.showSessionKey {
+                            if viewModel.isSessionKeyShown {
                                 TextField("sk-ant-...", text: $viewModel.sessionKey)
                                     .textFieldStyle(.roundedBorder)
                                     .font(.system(.body, design: .monospaced))
                                     .labelsHidden()
                                     .accessibilityLabel("Session key input")
-                                    
+
                             } else {
                                 SecureField("sk-ant-...", text: $viewModel.sessionKey)
                                     .textFieldStyle(.roundedBorder)
@@ -71,10 +71,10 @@ struct SettingsView: View {
                             Button(action: {
                                 viewModel.toggleSessionKeyVisibility()
                             }) {
-                                Image(systemName: viewModel.showSessionKey ? "eye.slash" : "eye")
+                                Image(systemName: viewModel.isSessionKeyShown ? "eye.slash" : "eye")
                             }
                             .buttonStyle(.borderless)
-                            .accessibilityLabel(viewModel.showSessionKey ? "Hide session key" : "Show session key")
+                            .accessibilityLabel(viewModel.isSessionKeyShown ? "Hide session key" : "Show session key")
                         }
 
                         HStack {
@@ -84,22 +84,22 @@ struct SettingsView: View {
                                 }
                             }
                             .buttonStyle(.borderedProminent)
-                            .disabled(viewModel.isValidating || viewModel.sessionKey.isEmpty)
+                            .disabled(viewModel.isValidatingSessionKey || viewModel.sessionKey.isEmpty)
                             .accessibilityLabel("Validate session key")
 
-                            if viewModel.isValidating {
+                            if viewModel.isValidatingSessionKey {
                                 ProgressView()
                                     .scaleEffect(0.5)
                             }
 
                             // Validation status
-                            if let message = viewModel.validationMessage {
+                            if let message = viewModel.sessionKeyValidationMessage {
                                 HStack(spacing: 4) {
-                                    Image(systemName: viewModel.validationSuccess ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                        .foregroundColor(viewModel.validationSuccess ? .green : .red)
+                                    Image(systemName: viewModel.hasSessionKeyValidationSucceeded ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                        .foregroundColor(viewModel.hasSessionKeyValidationSucceeded ? .green : .red)
                                     Text(message)
                                         .font(.caption)
-                                        .foregroundColor(viewModel.validationSuccess ? .green : .red)
+                                        .foregroundColor(viewModel.hasSessionKeyValidationSucceeded ? .green : .red)
                                 }
                                 .accessibilityLabel("Validation status: \(message)")
                             }
@@ -135,9 +135,9 @@ struct SettingsView: View {
                     }
                     .padding(.vertical, 8)
                     VStack(alignment: .leading, spacing: 8) {
-                        Toggle("Show Opus Usage", isOn: $viewModel.showOpusUsage)
+                        Toggle("Show Opus Usage", isOn: $viewModel.isOpusUsageShown)
                             .accessibilityLabel("Show Opus usage toggle")
-                        
+
                         Text("Display weekly Opus usage in the menu bar popover")
                             .font(.caption)
                             .foregroundColor(.secondary)
@@ -148,10 +148,10 @@ struct SettingsView: View {
 
                 // Notification Settings Section
                 Section {
-                    Toggle("Enable Notifications", isOn: $viewModel.notificationsEnabled)
+                    Toggle("Enable Notifications", isOn: $viewModel.hasNotificationsEnabled)
                         .accessibilityLabel("Enable notifications toggle")
 
-                    if viewModel.notificationsEnabled {
+                    if viewModel.hasNotificationsEnabled {
                         VStack(alignment: .leading, spacing: 12) {
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack {
@@ -185,17 +185,38 @@ struct SettingsView: View {
                                     .foregroundColor(.secondary)
                             }
 
-                            Toggle("Notify on Session Reset", isOn: $viewModel.notifyOnReset)
+                            Toggle("Notify on Session Reset", isOn: $viewModel.isNotifiedOnReset)
                                 .accessibilityLabel("Notify on session reset toggle")
 
-                            // Test notification button
-                            Button("Send Test Notification") {
-                                Task {
-                                    await viewModel.sendTestNotification()
+                            HStack {
+                                Button("Send Test Notification") {
+                                    Task {
+                                        await viewModel.sendTestNotification()
+                                    }
                                 }
+                                .buttonStyle(.bordered)
+                                .disabled(viewModel.isSendingTestNotification)
+                                .accessibilityLabel("Send test notification")
+
+                                if viewModel.isSendingTestNotification {
+                                    ProgressView()
+                                        .scaleEffect(0.5)
+                                }
+
+                                // Test notification status
+                                if let message = viewModel.testNotificationMessage {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: viewModel.hasTestNotificationSucceeded ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                            .foregroundColor(viewModel.hasTestNotificationSucceeded ? .green : .red)
+                                        Text(message)
+                                            .font(.caption)
+                                            .foregroundColor(viewModel.hasTestNotificationSucceeded ? .green : .red)
+                                    }
+                                    .accessibilityLabel("Test notification status: \(message)")
+                                }
+
+                                Spacer()
                             }
-                            .buttonStyle(.bordered)
-                            .accessibilityLabel("Send test notification")
                         }
                         .padding(.top, 8)
                     }

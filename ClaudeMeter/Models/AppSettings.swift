@@ -13,7 +13,7 @@ struct AppSettings: Codable, Equatable, Sendable {
     var refreshInterval: TimeInterval
 
     /// Whether notifications are enabled
-    var notificationsEnabled: Bool
+    var hasNotificationsEnabled: Bool
 
     /// Notification thresholds
     var notificationThresholds: NotificationThresholds
@@ -25,24 +25,24 @@ struct AppSettings: Codable, Equatable, Sendable {
     var cachedOrganizationId: UUID?
 
     /// Whether to show Opus usage in the popover
-    var showOpusUsage: Bool
+    var isOpusUsageShown: Bool
 
     static let `default` = AppSettings(
         refreshInterval: 60,
-        notificationsEnabled: true,
+        hasNotificationsEnabled: true,
         notificationThresholds: .default,
         isFirstLaunch: true,
         cachedOrganizationId: nil,
-        showOpusUsage: false
+        isOpusUsageShown: false
     )
 
     enum CodingKeys: String, CodingKey {
         case refreshInterval = "refresh_interval"
-        case notificationsEnabled = "notifications_enabled"
+        case hasNotificationsEnabled = "notifications_enabled"
         case notificationThresholds = "notification_thresholds"
         case isFirstLaunch = "is_first_launch"
         case cachedOrganizationId = "cached_organization_id"
-        case showOpusUsage = "show_opus_usage"
+        case isOpusUsageShown = "show_opus_usage"
     }
 }
 

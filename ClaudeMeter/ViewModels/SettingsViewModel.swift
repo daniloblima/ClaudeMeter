@@ -14,22 +14,30 @@ import AppKit
 final class SettingsViewModel: ObservableObject {
     // MARK: - Published Properties
 
+    // Session Key
     @Published var sessionKey: String = ""
+    @Published var isSessionKeyShown: Bool = false
+    @Published var isValidatingSessionKey: Bool = false
+    @Published var sessionKeyValidationMessage: String?
+    @Published var hasSessionKeyValidationSucceeded: Bool = false
+
+    // Display Settings
     @Published var refreshInterval: Double = 60
-    @Published var notificationsEnabled: Bool = true
+    @Published var isOpusUsageShown: Bool = false
+
+    // Notification Settings
+    @Published var hasNotificationsEnabled: Bool = true
     @Published var warningThreshold: Double = 75
     @Published var criticalThreshold: Double = 90
-    @Published var notifyOnReset: Bool = true
-    @Published var showOpusUsage: Bool = false
+    @Published var isNotifiedOnReset: Bool = true
+    @Published var isSendingTestNotification: Bool = false
+    @Published var testNotificationMessage: String?
+    @Published var hasTestNotificationSucceeded: Bool = false
 
-    @Published var isValidating: Bool = false
-    @Published var validationMessage: String?
-    @Published var validationSuccess: Bool = false
+    // General State
+    @Published var isLoadingSettings: Bool = true
     @Published var isSaving: Bool = false
     @Published var errorMessage: String?
-    @Published var isLoadingSettings: Bool = true
-
-    @Published var showSessionKey: Bool = false
 
     // MARK: - Dependencies
 
@@ -68,15 +76,15 @@ final class SettingsViewModel: ObservableObject {
             self.refreshInterval = settings.refreshInterval
             self.warningThreshold = settings.notificationThresholds.warningThreshold
             self.criticalThreshold = settings.notificationThresholds.criticalThreshold
-            self.notifyOnReset = settings.notificationThresholds.notifyOnReset
-            self.showOpusUsage = settings.showOpusUsage
+            self.isNotifiedOnReset = settings.notificationThresholds.isNotifiedOnReset
+            self.isOpusUsageShown = settings.isOpusUsageShown
 
             // Check actual system notification permissions and sync with settings
             let hasSystemPermission = await notificationService.checkNotificationPermissions()
-            self.notificationsEnabled = settings.notificationsEnabled && hasSystemPermission
+            self.hasNotificationsEnabled = settings.hasNotificationsEnabled && hasSystemPermission
 
             // If settings say enabled but system permission is denied, clear error and allow re-enabling
-            if settings.notificationsEnabled && !hasSystemPermission {
+            if settings.hasNotificationsEnabled && !hasSystemPermission {
                 errorMessage = nil
             }
 
@@ -92,14 +100,14 @@ final class SettingsViewModel: ObservableObject {
     /// Validate session key before saving
     func validateSessionKey() async {
         guard !sessionKey.isEmpty else {
-            validationMessage = "Session key cannot be empty"
-            validationSuccess = false
+            sessionKeyValidationMessage = "Session key cannot be empty"
+            hasSessionKeyValidationSucceeded = false
             return
         }
 
-        isValidating = true
-        validationMessage = nil
-        validationSuccess = false
+        isValidatingSessionKey = true
+        sessionKeyValidationMessage = nil
+        hasSessionKeyValidationSucceeded = false
         errorMessage = nil
 
         do {
@@ -110,21 +118,28 @@ final class SettingsViewModel: ObservableObject {
             let isValid = try await usageService.validateSessionKey(key)
 
             if isValid {
-                validationMessage = "Session key is valid"
-                validationSuccess = true
+                sessionKeyValidationMessage = "Session key is valid"
+                hasSessionKeyValidationSucceeded = true
+
+                // Clear success message after 3 seconds
+                Task {
+                    try await Task.sleep(nanoseconds: 3_000_000_000)
+                    sessionKeyValidationMessage = nil
+                    hasSessionKeyValidationSucceeded = false
+                }
             } else {
-                validationMessage = "Session key validation failed"
-                validationSuccess = false
+                sessionKeyValidationMessage = "Session key validation failed"
+                hasSessionKeyValidationSucceeded = false
             }
         } catch let error as SessionKeyError {
-            validationMessage = error.localizedDescription
-            validationSuccess = false
+            sessionKeyValidationMessage = error.localizedDescription
+            hasSessionKeyValidationSucceeded = false
         } catch {
-            validationMessage = "Validation failed: \(error.localizedDescription)"
-            validationSuccess = false
+            sessionKeyValidationMessage = "Validation failed: \(error.localizedDescription)"
+            hasSessionKeyValidationSucceeded = false
         }
 
-        isValidating = false
+        isValidatingSessionKey = false
     }
 
     /// Save settings
@@ -147,7 +162,7 @@ final class SettingsViewModel: ObservableObject {
             }
 
             // Request notification authorization if enabling notifications
-            if notificationsEnabled {
+            if hasNotificationsEnabled {
                 let hasPermission = await notificationService.checkNotificationPermissions()
                 if !hasPermission {
                     do {
@@ -156,7 +171,7 @@ final class SettingsViewModel: ObservableObject {
                             errorMessage = "Notifications disabled. Open System Settings > Notifications > ClaudeMeter to enable."
                             isSaving = false
                             // Don't return - save other settings anyway
-                            notificationsEnabled = false // Reflect actual state
+                            hasNotificationsEnabled = false // Reflect actual state
                         }
                     } catch {
                         errorMessage = "Failed to request notification permission: \(error.localizedDescription)"
@@ -169,13 +184,13 @@ final class SettingsViewModel: ObservableObject {
             // Create updated settings
             var settings = await settingsRepository.load()
             settings.refreshInterval = refreshInterval
-            settings.notificationsEnabled = notificationsEnabled
+            settings.hasNotificationsEnabled = hasNotificationsEnabled
             settings.notificationThresholds = NotificationThresholds(
                 warningThreshold: warningThreshold,
                 criticalThreshold: criticalThreshold,
-                notifyOnReset: notifyOnReset
+                isNotifiedOnReset: isNotifiedOnReset
             )
-            settings.showOpusUsage = showOpusUsage
+            settings.isOpusUsageShown = isOpusUsageShown
 
             // Save to repository
             try await settingsRepository.save(settings)
@@ -192,7 +207,7 @@ final class SettingsViewModel: ObservableObject {
 
     /// Toggle session key visibility
     func toggleSessionKeyVisibility() {
-        showSessionKey.toggle()
+        isSessionKeyShown.toggle()
     }
 
     /// Open System Settings to Notifications pane
@@ -204,14 +219,19 @@ final class SettingsViewModel: ObservableObject {
 
     /// Send test notification
     func sendTestNotification() async {
+        isSendingTestNotification = true
+        testNotificationMessage = nil
+        hasTestNotificationSucceeded = false
+
         do {
             // Check if we have permission first
             let hasPermission = await notificationService.checkNotificationPermissions()
             if !hasPermission {
                 let granted = try await notificationService.requestAuthorization()
                 if !granted {
-                    validationMessage = "Notification permission denied"
-                    validationSuccess = false
+                    testNotificationMessage = "Notification permission denied. Open System Settings > Notifications > ClaudeMeter to enable."
+                    hasTestNotificationSucceeded = false
+                    isSendingTestNotification = false
                     return
                 }
             }
@@ -223,12 +243,21 @@ final class SettingsViewModel: ObservableObject {
                 resetTime: Date().addingTimeInterval(3600)
             )
 
-            validationMessage = "Test notification sent!"
-            validationSuccess = true
+            testNotificationMessage = "Test notification sent!"
+            hasTestNotificationSucceeded = true
+
+            // Clear message after 3 seconds
+            Task {
+                try await Task.sleep(nanoseconds: 3_000_000_000)
+                testNotificationMessage = nil
+                hasTestNotificationSucceeded = false
+            }
         } catch {
-            validationMessage = "Failed to send test notification"
-            validationSuccess = false
+            testNotificationMessage = "Failed to send test notification: \(error.localizedDescription)"
+            hasTestNotificationSucceeded = false
         }
+
+        isSendingTestNotification = false
     }
 }
 

@@ -62,9 +62,9 @@ final class NotificationService: NSObject, NotificationServiceProtocol, UNUserNo
         // Save notification state to persistence
         var state = await settingsRepository.loadNotificationState()
         if threshold == .warning {
-            state.warningNotified = true
+            state.hasWarningBeenNotified = true
         } else if threshold == .critical {
-            state.criticalNotified = true
+            state.hasCriticalBeenNotified = true
         }
         try? await settingsRepository.saveNotificationState(state)
     }
@@ -95,9 +95,9 @@ final class NotificationService: NSObject, NotificationServiceProtocol, UNUserNo
         // Update persisted state
         var state = await settingsRepository.loadNotificationState()
         if threshold == .warning {
-            state.warningNotified = false
+            state.hasWarningBeenNotified = false
         } else if threshold == .critical {
-            state.criticalNotified = false
+            state.hasCriticalBeenNotified = false
         }
         try? await settingsRepository.saveNotificationState(state)
     }
@@ -113,7 +113,7 @@ final class NotificationService: NSObject, NotificationServiceProtocol, UNUserNo
     private func shouldSendNotifications() async -> Bool {
         let systemPermission = await checkNotificationPermissions()
         let settings = await settingsRepository.load()
-        return systemPermission && settings.notificationsEnabled
+        return systemPermission && settings.hasNotificationsEnabled
     }
 
     // MARK: - UNUserNotificationCenterDelegate

@@ -103,7 +103,7 @@ struct UsagePopoverView: View {
                         )
 
                         // Opus usage card (conditional rendering)
-                        if viewModel.showOpusUsage, let opusUsage = usageData.opusUsage {
+                        if viewModel.isOpusUsageShown, let opusUsage = usageData.opusUsage {
                             UsageCardView(
                                 title: "Weekly Opus",
                                 usageLimit: opusUsage,

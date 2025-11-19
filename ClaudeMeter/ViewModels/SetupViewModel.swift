@@ -17,7 +17,7 @@ final class SetupViewModel: ObservableObject {
     @Published var sessionKeyInput: String = ""
     @Published var isValidating: Bool = false
     @Published var errorMessage: String?
-    @Published var validationSuccess: Bool = false
+    @Published var hasValidationSucceeded: Bool = false
 
     // MARK: - Dependencies
 
@@ -88,7 +88,7 @@ final class SetupViewModel: ObservableObject {
             settings.isFirstLaunch = false
             try await settingsRepository.save(settings)
 
-            validationSuccess = true
+            hasValidationSucceeded = true
             isValidating = false
 
             // Trigger setup completion callback

@@ -16,18 +16,18 @@ struct NotificationThresholds: Codable, Equatable, Sendable {
     var criticalThreshold: Double
 
     /// Whether to notify on session reset
-    var notifyOnReset: Bool
+    var isNotifiedOnReset: Bool
 
     static let `default` = NotificationThresholds(
         warningThreshold: 75,
         criticalThreshold: 90,
-        notifyOnReset: true
+        isNotifiedOnReset: true
     )
 
     enum CodingKeys: String, CodingKey {
         case warningThreshold = "warning_threshold"
         case criticalThreshold = "critical_threshold"
-        case notifyOnReset = "notify_on_reset"
+        case isNotifiedOnReset = "notify_on_reset"
     }
 }
 

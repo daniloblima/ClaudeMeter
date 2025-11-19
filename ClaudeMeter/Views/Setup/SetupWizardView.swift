@@ -81,7 +81,7 @@ struct SetupWizardView: View {
             }
 
             // Success Message
-            if viewModel.validationSuccess {
+            if viewModel.hasValidationSucceeded {
                 HStack(spacing: 8) {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.green)
@@ -193,11 +193,11 @@ private actor StubSettingsRepository: SettingsRepositoryProtocol {
     func load() async -> AppSettings {
         await AppSettings(
             refreshInterval: 60,
-            notificationsEnabled: false,
+            hasNotificationsEnabled: false,
             notificationThresholds: .default,
             isFirstLaunch: true,
             cachedOrganizationId: nil,
-            showOpusUsage: false
+            isOpusUsageShown: false
         )
     }
     func save(_ settings: AppSettings) async throws {}

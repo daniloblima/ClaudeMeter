@@ -9,18 +9,15 @@ import Foundation
 
 /// Tracks which notification thresholds have been triggered
 struct NotificationState: Codable, Equatable, Sendable {
-    /// Whether warning (75%) notification has been sent
-    var warningNotified: Bool = false
-
-    /// Whether critical (90%) notification has been sent
-    var criticalNotified: Bool = false
+    var hasWarningBeenNotified: Bool = false
+    var hasCriticalBeenNotified: Bool = false
 
     /// Last known usage percentage to detect reset
     var lastPercentage: Double = 0
 
     enum CodingKeys: String, CodingKey {
-        case warningNotified = "warning_notified"
-        case criticalNotified = "critical_notified"
+        case hasWarningBeenNotified = "warning_notified"
+        case hasCriticalBeenNotified = "critical_notified"
         case lastPercentage = "last_percentage"
     }
 }
@@ -29,10 +26,10 @@ extension NotificationState {
     /// Reset tracking when usage drops below thresholds
     mutating func resetIfNeeded(currentPercentage: Double, warningThreshold: Double, criticalThreshold: Double) {
         if currentPercentage < warningThreshold {
-            warningNotified = false
+            hasWarningBeenNotified = false
         }
         if currentPercentage < criticalThreshold {
-            criticalNotified = false
+            hasCriticalBeenNotified = false
         }
         lastPercentage = currentPercentage
     }
@@ -44,11 +41,11 @@ extension NotificationState {
         isWarning: Bool
     ) -> Bool {
         // Check if crossing warning threshold
-        if isWarning && !warningNotified && currentPercentage >= threshold {
+        if isWarning && !hasWarningBeenNotified && currentPercentage >= threshold {
             return true
         }
         // Check if crossing critical threshold
-        if !isWarning && !criticalNotified && currentPercentage >= threshold {
+        if !isWarning && !hasCriticalBeenNotified && currentPercentage >= threshold {
             return true
         }
         return false
