@@ -24,6 +24,8 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2025. All rights reserved.</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>ClaudeMeter sends notifications to alert you when your Claude.ai usage approaches threshold limits (warning and critical levels) and when your usage session resets.</string>
 	<key>NSSupportsAutomaticTermination</key>
 	<true/>
 	<key>NSSupportsSuddenTermination</key>
