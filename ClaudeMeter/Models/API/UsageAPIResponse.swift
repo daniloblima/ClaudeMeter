@@ -48,7 +48,7 @@ enum MappingError: LocalizedError {
 
 /// Extension to map API response to domain model
 extension UsageAPIResponse {
-    func toDomain(timezone: TimeZone = .current) throws -> UsageData {
+    func toDomain() throws -> UsageData {
         // Configure ISO8601 formatter with proper options
         let iso8601Formatter = ISO8601DateFormatter()
         iso8601Formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -97,8 +97,7 @@ extension UsageAPIResponse {
                 resetAt: weeklyResetDate
             ),
             sonnetUsage: sonnetLimit,
-            lastUpdated: Date(),
-            timezone: timezone
+            lastUpdated: Date()
         )
     }
 }

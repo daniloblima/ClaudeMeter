@@ -21,15 +21,11 @@ struct UsageData: Codable, Equatable, Sendable {
     /// Timestamp of when this data was fetched
     let lastUpdated: Date
 
-    /// User's timezone for display formatting
-    let timezone: TimeZone
-
     enum CodingKeys: String, CodingKey {
         case sessionUsage = "session_usage"
         case weeklyUsage = "weekly_usage"
         case sonnetUsage = "sonnet_usage"
         case lastUpdated = "last_updated"
-        case timezone
     }
 }
 

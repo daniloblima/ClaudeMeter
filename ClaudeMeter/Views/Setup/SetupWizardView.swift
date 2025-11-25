@@ -179,8 +179,7 @@ private actor StubUsageService: UsageServiceProtocol {
             sessionUsage: stubLimit,
             weeklyUsage: stubLimit,
             sonnetUsage: nil,
-            lastUpdated: Date(),
-            timezone: .current
+            lastUpdated: Date()
         )
     }
     func fetchOrganizations() async throws -> [Organization] { [] }

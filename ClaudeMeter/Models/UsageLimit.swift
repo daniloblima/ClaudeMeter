@@ -39,8 +39,8 @@ extension UsageLimit {
         }
     }
 
-    /// Human-readable reset time
-    func resetDescription(in timezone: TimeZone = .current) -> String {
+    /// Human-readable reset time (uses system timezone via RelativeDateTimeFormatter)
+    var resetDescription: String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .full
         return formatter.localizedString(for: resetAt, relativeTo: Date())

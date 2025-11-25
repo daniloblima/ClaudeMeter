@@ -90,16 +90,14 @@ struct UsagePopoverView: View {
                         UsageCardView(
                             title: "5-Hour Session",
                             usageLimit: usageData.sessionUsage,
-                            icon: "gauge.with.dots.needle.67percent",
-                            timezone: usageData.timezone
+                            icon: "gauge.with.dots.needle.67percent"
                         )
 
                         // Weekly usage card
                         UsageCardView(
                             title: "Weekly Usage",
                             usageLimit: usageData.weeklyUsage,
-                            icon: "calendar",
-                            timezone: usageData.timezone
+                            icon: "calendar"
                         )
 
                         // Sonnet usage card (conditional rendering)
@@ -107,8 +105,7 @@ struct UsagePopoverView: View {
                             UsageCardView(
                                 title: "Weekly Sonnet",
                                 usageLimit: sonnetUsage,
-                                icon: "sparkles",
-                                timezone: usageData.timezone
+                                icon: "sparkles"
                             )
                         }
                     }
@@ -178,8 +175,7 @@ struct UsagePopoverView: View {
             utilization: 50.0,
             resetAt: Date().addingTimeInterval(86400 * 3)
         ),
-        lastUpdated: Date(),
-        timezone: .current
+        lastUpdated: Date()
     )
 
     return UsagePopoverView(viewModel: viewModel)
