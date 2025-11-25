@@ -70,6 +70,7 @@ struct UsageCardView: View {
                     .font(.caption)
             }
             .foregroundColor(.secondary)
+            .help(usageLimit.resetTimeFormatted)
         }
         .padding(16)
         .background(Color(nsColor: .controlBackgroundColor))

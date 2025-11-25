@@ -46,6 +46,15 @@ extension UsageLimit {
         return formatter.localizedString(for: resetAt, relativeTo: Date())
     }
 
+    /// Exact reset time formatted in user's timezone for tooltip display
+    var resetTimeFormatted: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        formatter.timeZone = .current
+        return formatter.string(from: resetAt)
+    }
+
     /// Check if limit has been exceeded
     var isExceeded: Bool {
         utilization >= 100
