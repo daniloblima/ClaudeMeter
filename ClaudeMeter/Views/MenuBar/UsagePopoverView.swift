@@ -90,25 +90,22 @@ struct UsagePopoverView: View {
                         UsageCardView(
                             title: "5-Hour Session",
                             usageLimit: usageData.sessionUsage,
-                            icon: "gauge.with.dots.needle.67percent",
-                            timezone: usageData.timezone
+                            icon: "gauge.with.dots.needle.67percent"
                         )
 
                         // Weekly usage card
                         UsageCardView(
                             title: "Weekly Usage",
                             usageLimit: usageData.weeklyUsage,
-                            icon: "calendar",
-                            timezone: usageData.timezone
+                            icon: "calendar"
                         )
 
-                        // Opus usage card (conditional rendering)
-                        if viewModel.isOpusUsageShown, let opusUsage = usageData.opusUsage {
+                        // Sonnet usage card (conditional rendering)
+                        if viewModel.isSonnetUsageShown, let sonnetUsage = usageData.sonnetUsage {
                             UsageCardView(
-                                title: "Weekly Opus",
-                                usageLimit: opusUsage,
-                                icon: "sparkles",
-                                timezone: usageData.timezone
+                                title: "Weekly Sonnet",
+                                usageLimit: sonnetUsage,
+                                icon: "sparkles"
                             )
                         }
                     }
@@ -167,22 +164,18 @@ struct UsagePopoverView: View {
     // Mock data for preview
     viewModel.usageData = UsageData(
         sessionUsage: UsageLimit(
-            tokensUsed: 35000,
-            tokensLimit: 100000,
+            utilization: 35.0,
             resetAt: Date().addingTimeInterval(7200)
         ),
         weeklyUsage: UsageLimit(
-            tokensUsed: 750000,
-            tokensLimit: 1000000,
+            utilization: 75.0,
             resetAt: Date().addingTimeInterval(86400 * 3)
         ),
-        opusUsage: UsageLimit(
-            tokensUsed: 50000,
-            tokensLimit: 100000,
+        sonnetUsage: UsageLimit(
+            utilization: 50.0,
             resetAt: Date().addingTimeInterval(86400 * 3)
         ),
-        lastUpdated: Date(),
-        timezone: .current
+        lastUpdated: Date()
     )
 
     return UsagePopoverView(viewModel: viewModel)

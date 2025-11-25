@@ -12,7 +12,6 @@ struct UsageCardView: View {
     let title: String
     let usageLimit: UsageLimit
     let icon: String
-    let timezone: TimeZone
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -67,17 +66,18 @@ struct UsageCardView: View {
             HStack(spacing: 4) {
                 Image(systemName: "clock")
                     .font(.caption)
-                Text("Resets \(usageLimit.resetDescription(in: timezone))")
+                Text("Resets \(usageLimit.resetDescription)")
                     .font(.caption)
             }
             .foregroundColor(.secondary)
+            .help(usageLimit.resetTimeFormatted)
         }
         .padding(16)
         .background(Color(nsColor: .controlBackgroundColor))
         .cornerRadius(12)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title): \(Int(usageLimit.percentage))% used, \(usageLimit.status.accessibilityDescription)")
-        .accessibilityValue("Resets \(usageLimit.resetDescription(in: timezone))")
+        .accessibilityValue("Resets \(usageLimit.resetDescription)")
     }
 }
 
@@ -88,23 +88,19 @@ struct UsageCardView: View {
         UsageCardView(
             title: "5-Hour Session",
             usageLimit: UsageLimit(
-                tokensUsed: 35000,
-                tokensLimit: 100000,
+                utilization: 35.0,
                 resetAt: Date().addingTimeInterval(7200)
             ),
-            icon: "gauge.with.dots.needle.67percent",
-            timezone: .current
+            icon: "gauge.with.dots.needle.67percent"
         )
 
         UsageCardView(
             title: "Weekly Usage",
             usageLimit: UsageLimit(
-                tokensUsed: 750000,
-                tokensLimit: 1000000,
+                utilization: 75.0,
                 resetAt: Date().addingTimeInterval(86400 * 3)
             ),
-            icon: "calendar",
-            timezone: .current
+            icon: "calendar"
         )
     }
     .padding()

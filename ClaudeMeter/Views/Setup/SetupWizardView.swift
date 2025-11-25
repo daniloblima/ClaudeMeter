@@ -172,16 +172,14 @@ private actor StubKeychainRepository: KeychainRepositoryProtocol {
 private actor StubUsageService: UsageServiceProtocol {
     func fetchUsage(forceRefresh: Bool) async throws -> UsageData {
         let stubLimit = UsageLimit(
-            tokensUsed: 0,
-            tokensLimit: 100,
+            utilization: 0,
             resetAt: Date().addingTimeInterval(3600)
         )
         return UsageData(
             sessionUsage: stubLimit,
             weeklyUsage: stubLimit,
-            opusUsage: nil,
-            lastUpdated: Date(),
-            timezone: .current
+            sonnetUsage: nil,
+            lastUpdated: Date()
         )
     }
     func fetchOrganizations() async throws -> [Organization] { [] }
@@ -197,7 +195,7 @@ private actor StubSettingsRepository: SettingsRepositoryProtocol {
             notificationThresholds: .default,
             isFirstLaunch: true,
             cachedOrganizationId: nil,
-            isOpusUsageShown: false
+            isSonnetUsageShown: false
         )
     }
     func save(_ settings: AppSettings) async throws {}
