@@ -74,6 +74,14 @@ jobs:
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
             OTHER_CODE_SIGN_FLAGS="--timestamp --options runtime"
 
+      - name: Verify code signature
+        run: |
+          APP_PATH="build/Build/Products/Release/ClaudeMeter.app"
+          echo "Verifying code signature..."
+          codesign -vvv --deep --strict "$APP_PATH"
+          echo "Checking signature details..."
+          codesign -dvv "$APP_PATH"
+
       - name: Notarize app
         env:
           APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
@@ -87,11 +95,29 @@ jobs:
           /usr/bin/ditto -c -k --keepParent "$APP_PATH" "$RUNNER_TEMP/ClaudeMeter-notarize.zip"
 
           echo "Submitting for notarization..."
-          xcrun notarytool submit "$RUNNER_TEMP/ClaudeMeter-notarize.zip" \
+          SUBMIT_OUTPUT=$(xcrun notarytool submit "$RUNNER_TEMP/ClaudeMeter-notarize.zip" \
             --key "$RUNNER_TEMP/AuthKey.p8" \
             --key-id "$APP_STORE_CONNECT_KEY_ID" \
             --issuer "$APP_STORE_CONNECT_ISSUER_ID" \
-            --wait
+            --wait 2>&1)
+
+          echo "$SUBMIT_OUTPUT"
+
+          # Extract submission ID
+          SUBMISSION_ID=$(echo "$SUBMIT_OUTPUT" | grep "id:" | head -1 | awk '{print $2}')
+
+          # Check if notarization succeeded
+          if echo "$SUBMIT_OUTPUT" | grep -q "status: Accepted"; then
+            echo "Notarization succeeded!"
+          else
+            echo "Notarization failed. Fetching detailed log..."
+            xcrun notarytool log "$SUBMISSION_ID" \
+              --key "$RUNNER_TEMP/AuthKey.p8" \
+              --key-id "$APP_STORE_CONNECT_KEY_ID" \
+              --issuer "$APP_STORE_CONNECT_ISSUER_ID"
+            rm -f $RUNNER_TEMP/AuthKey.p8 $RUNNER_TEMP/ClaudeMeter-notarize.zip
+            exit 1
+          fi
 
           echo "Stapling notarization ticket..."
           xcrun stapler staple "$APP_PATH"
