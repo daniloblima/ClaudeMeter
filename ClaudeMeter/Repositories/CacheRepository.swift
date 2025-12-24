@@ -81,6 +81,8 @@ actor CacheRepository: CacheRepositoryProtocol {
         }
 
         // Also write to public location for external tools (statusline scripts, etc.)
+        // Note: Ideally this would be a separate service, but since we always export
+        // when caching fresh data, co-locating here avoids additional coordination.
         saveToPublicJSON(data)
     }
 
