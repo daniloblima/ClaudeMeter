@@ -52,7 +52,15 @@ ClaudeMeter sends native macOS notifications when you reach warning or critical 
 
 ## Installation
 
-1. Download the latest release
+### Homebrew (Recommended)
+
+```bash
+brew install eddmann/tap/claudemeter
+```
+
+### Manual Download
+
+1. Download the latest release from [GitHub Releases](https://github.com/eddmann/ClaudeMeter/releases)
 2. Unzip and move `ClaudeMeter.app` to Applications
 3. Double-click to open
 
