@@ -634,9 +634,7 @@ struct SettingsAutoSaveModifier: ViewModifier {
         content
             .onChange(of: refreshInterval) { _, _ in saveSettings() }
             .onChange(of: isSonnetUsageShown) { _, _ in saveSettings() }
-            .onChange(of: iconStyle) { _, newValue in
-                // Clear preview on actual selection change
-                NotificationCenter.default.post(name: .iconStylePreviewChanged, object: nil)
+            .onChange(of: iconStyle) { _, _ in
                 saveSettings()
             }
             .onChange(of: hasNotificationsEnabled) { _, newValue in
