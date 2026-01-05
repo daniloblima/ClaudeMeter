@@ -162,13 +162,19 @@ final class MenuBarManager: ObservableObject {
         guard let vm = viewModel else { return }
 
         let popoverViewModel = UsagePopoverViewModel(
-            usageService: container.usageService,
-            settingsRepository: container.settingsRepository
+            settingsRepository: container.settingsRepository,
+            onRefreshRequest: { [weak vm] in
+                await vm?.fetchUsage(forceRefresh: true)
+            }
         )
 
         // Share usage data from menu bar view model
         vm.$usageData
             .assign(to: &popoverViewModel.$usageData)
+
+        // Share error message from menu bar view model
+        vm.$errorMessage
+            .assign(to: &popoverViewModel.$errorMessage)
 
         let popoverView = UsagePopoverView(viewModel: popoverViewModel)
         let hostingController = NSHostingController(rootView: popoverView)

@@ -157,7 +157,6 @@ struct UsagePopoverView: View {
 #Preview {
     let container = DIContainer.shared
     let viewModel = UsagePopoverViewModel(
-        usageService: container.usageService,
         settingsRepository: container.settingsRepository
     )
 

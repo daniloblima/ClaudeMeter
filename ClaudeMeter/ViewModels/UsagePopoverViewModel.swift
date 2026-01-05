@@ -20,15 +20,18 @@ final class UsagePopoverViewModel: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let usageService: UsageServiceProtocol
     private let settingsRepository: SettingsRepositoryProtocol
+    private let onRefreshRequest: (() async -> Void)?
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
 
-    init(usageService: UsageServiceProtocol, settingsRepository: SettingsRepositoryProtocol) {
-        self.usageService = usageService
+    init(
+        settingsRepository: SettingsRepositoryProtocol,
+        onRefreshRequest: (() async -> Void)? = nil
+    ) {
         self.settingsRepository = settingsRepository
+        self.onRefreshRequest = onRefreshRequest
 
         // Load initial settings
         Task {
@@ -53,18 +56,12 @@ final class UsagePopoverViewModel: ObservableObject {
         self.isSonnetUsageShown = settings.isSonnetUsageShown
     }
 
-    /// Manual refresh (clears cache and fetches fresh data)
+    /// Manual refresh - delegates to parent via callback
     func refresh() async {
+        guard let onRefreshRequest = onRefreshRequest else { return }
         isRefreshing = true
         errorMessage = nil
-
-        do {
-            let data = try await usageService.fetchUsage(forceRefresh: true)
-            self.usageData = data
-            isRefreshing = false
-        } catch {
-            errorMessage = error.localizedDescription
-            isRefreshing = false
-        }
+        await onRefreshRequest()
+        isRefreshing = false
     }
 }
