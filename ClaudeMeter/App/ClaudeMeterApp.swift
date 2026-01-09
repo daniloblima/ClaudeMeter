@@ -21,6 +21,9 @@ struct ClaudeMeterApp: App {
             }
         } label: {
             MenuBarLabelView(appModel: appModel)
+                .task {
+                    await appModel.bootstrap()
+                }
         }
         .menuBarExtraStyle(.window)
 

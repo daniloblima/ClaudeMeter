@@ -67,15 +67,12 @@ final class AppModel {
         )
 
         self.notificationService.setupDelegate()
-
-        Task { @MainActor in
-            await bootstrap()
-        }
     }
 
     // MARK: - Lifecycle
 
     func bootstrap() async {
+        guard !isReady else { return }
         settings = await settingsRepository.load()
         hasLoadedSettings = true
 

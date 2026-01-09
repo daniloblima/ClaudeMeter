@@ -11,11 +11,15 @@ import UserNotifications
 /// Main actor-isolated notification service
 @MainActor
 final class NotificationService: NSObject, NotificationServiceProtocol, UNUserNotificationCenterDelegate {
-    private let center = UNUserNotificationCenter.current()
+    private var center: UserNotificationCenterProtocol
     private let settingsRepository: SettingsRepositoryProtocol
 
-    init(settingsRepository: SettingsRepositoryProtocol) {
+    init(
+        settingsRepository: SettingsRepositoryProtocol,
+        notificationCenter: UserNotificationCenterProtocol = UNUserNotificationCenter.current()
+    ) {
         self.settingsRepository = settingsRepository
+        self.center = notificationCenter
         super.init()
     }
 
@@ -136,8 +140,7 @@ final class NotificationService: NSObject, NotificationServiceProtocol, UNUserNo
 
     /// Check system notification permissions
     func checkNotificationPermissions() async -> Bool {
-        let settings = await center.notificationSettings()
-        return settings.authorizationStatus == .authorized
+        await center.authorizationStatus() == .authorized
     }
 
     // MARK: - Private Methods
