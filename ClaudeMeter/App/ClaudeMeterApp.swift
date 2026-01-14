@@ -24,6 +24,9 @@ struct ClaudeMeterApp: App {
                 .task {
                     await appModel.bootstrap()
                 }
+                .onReceive(NotificationCenter.default.publisher(for: .openUsagePopover)) { _ in
+                    appModel.openUsagePopover()
+                }
         }
         .menuBarExtraStyle(.window)
 

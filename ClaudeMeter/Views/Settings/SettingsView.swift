@@ -40,13 +40,11 @@ struct SettingsView: View {
             loadSettings()
         }
         .onChange(of: appModel.settings.hasNotificationsEnabled) { _, newValue in
-            if newValue {
-                Task {
+            Task {
+                if newValue {
                     await appModel.requestNotificationPermissionIfNeeded()
-                    await updateNotificationStatus()
                 }
-            } else {
-                notificationError = nil
+                await updateNotificationStatus()
             }
         }
         .onChange(of: launchAtLogin) { _, newValue in
@@ -497,8 +495,11 @@ struct SettingsView: View {
     @MainActor
     private func updateNotificationStatus() async {
         let hasPermission = await appModel.checkNotificationPermissions()
-        if appModel.settings.hasNotificationsEnabled && !hasPermission {
+        if !hasPermission {
             notificationError = "Notifications disabled in System Settings"
+            if appModel.settings.hasNotificationsEnabled {
+                appModel.settings.hasNotificationsEnabled = false
+            }
         } else {
             notificationError = nil
         }

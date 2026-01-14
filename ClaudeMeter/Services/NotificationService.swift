@@ -158,6 +158,11 @@ final class NotificationService: NSObject, NotificationServiceProtocol, UNUserNo
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
+        NotificationCenter.default.post(name: .openUsagePopover, object: nil)
         completionHandler()
     }
+}
+
+extension Notification.Name {
+    static let openUsagePopover = Notification.Name("openUsagePopover")
 }

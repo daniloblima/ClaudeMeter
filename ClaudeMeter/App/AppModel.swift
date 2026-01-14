@@ -5,6 +5,7 @@
 //  Created by Edd on 2026-01-09.
 //
 
+import AppKit
 import Foundation
 import Observation
 
@@ -39,6 +40,7 @@ final class AppModel {
 
     @ObservationIgnored private var refreshTask: Task<Void, Never>?
     @ObservationIgnored private var settingsSaveTask: Task<Void, Never>?
+    @ObservationIgnored private var wakeTask: Task<Void, Never>?
     @ObservationIgnored private var hasLoadedSettings: Bool = false
     @ObservationIgnored private let refreshClock = ContinuousClock()
 
@@ -83,6 +85,8 @@ final class AppModel {
             await refreshUsage(forceRefresh: true)
             startRefreshLoop()
         }
+
+        startWakeObserver()
     }
 
     // MARK: - Usage
@@ -186,6 +190,11 @@ final class AppModel {
         )
     }
 
+    func openUsagePopover() {
+        NSApp.activate(ignoringOtherApps: true)
+        findStatusBarButton()?.performClick(nil)
+    }
+
     // MARK: - Private
 
     private func scheduleSettingsSave(previous: AppSettings) {
@@ -211,5 +220,39 @@ final class AppModel {
                 await self.refreshUsage()
             }
         }
+    }
+
+    private func startWakeObserver() {
+        wakeTask?.cancel()
+        wakeTask = Task { [weak self] in
+            guard let self else { return }
+            for await _ in NSWorkspace.shared.notificationCenter.notifications(named: NSWorkspace.didWakeNotification) {
+                await self.refreshUsage(forceRefresh: true)
+            }
+        }
+    }
+
+    private func findStatusBarButton() -> NSStatusBarButton? {
+        let statusWindows = NSApp.windows.filter {
+            $0.level == .statusBar || String(describing: type(of: $0)).contains("StatusBar")
+        }
+
+        return statusWindows.compactMap({ findStatusBarButton(in: $0.contentView) }).first
+    }
+
+    private func findStatusBarButton(in view: NSView?) -> NSStatusBarButton? {
+        guard let view else { return nil }
+
+        if let button = view as? NSStatusBarButton {
+            return button
+        }
+
+        for subview in view.subviews {
+            if let found = findStatusBarButton(in: subview) {
+                return found
+            }
+        }
+
+        return nil
     }
 }
