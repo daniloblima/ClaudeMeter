@@ -10,26 +10,16 @@ import SwiftUI
 /// Main app entry point
 @main
 struct ClaudeMeterApp: App {
-    @State private var appModel = AppModel()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    @State private var appModel: AppModel
+
+    init() {
+        let model = AppModel()
+        _appModel = State(initialValue: model)
+        appDelegate.configure(appModel: model)
+    }
 
     var body: some Scene {
-        MenuBarExtra {
-            if appModel.isSetupComplete {
-                UsagePopoverView(appModel: appModel)
-            } else {
-                SetupWizardView(appModel: appModel)
-            }
-        } label: {
-            MenuBarLabelView(appModel: appModel)
-                .task {
-                    await appModel.bootstrap()
-                }
-                .onReceive(NotificationCenter.default.publisher(for: .openUsagePopover)) { _ in
-                    appModel.openUsagePopover()
-                }
-        }
-        .menuBarExtraStyle(.window)
-
         Settings {
             SettingsView(appModel: appModel)
         }

@@ -190,11 +190,6 @@ final class AppModel {
         )
     }
 
-    func openUsagePopover() {
-        NSApp.activate(ignoringOtherApps: true)
-        findStatusBarButton()?.performClick(nil)
-    }
-
     // MARK: - Private
 
     private func scheduleSettingsSave(previous: AppSettings) {
@@ -232,27 +227,4 @@ final class AppModel {
         }
     }
 
-    private func findStatusBarButton() -> NSStatusBarButton? {
-        let statusWindows = NSApp.windows.filter {
-            $0.level == .statusBar || String(describing: type(of: $0)).contains("StatusBar")
-        }
-
-        return statusWindows.compactMap({ findStatusBarButton(in: $0.contentView) }).first
-    }
-
-    private func findStatusBarButton(in view: NSView?) -> NSStatusBarButton? {
-        guard let view else { return nil }
-
-        if let button = view as? NSStatusBarButton {
-            return button
-        }
-
-        for subview in view.subviews {
-            if let found = findStatusBarButton(in: subview) {
-                return found
-            }
-        }
-
-        return nil
-    }
 }

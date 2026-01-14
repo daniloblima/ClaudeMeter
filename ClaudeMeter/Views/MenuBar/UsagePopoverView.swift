@@ -11,8 +11,8 @@ import AppKit
 /// Usage popover view with detailed metrics
 struct UsagePopoverView: View {
     @Bindable var appModel: AppModel
+    let onRequestClose: (() -> Void)?
     @Environment(\.openSettings) private var openSettings
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: 0) {
@@ -154,7 +154,7 @@ struct UsagePopoverView: View {
     }
 
     private func openSettingsFront() {
-        dismiss()
+        onRequestClose?()
         if let keyWindow = NSApp.keyWindow, keyWindow.level != .normal {
             keyWindow.orderOut(nil)
         }
