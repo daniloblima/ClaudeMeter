@@ -1,6 +1,6 @@
 # ClaudeMeter
 
-![ClaudeMeter](README/heading.png)
+![ClaudeMeter](docs/heading.png)
 
 Keep track of your Claude.ai plan usage at a glance.
 
@@ -18,15 +18,15 @@ Keep track of your Claude.ai plan usage at a glance.
 The menu bar icon changes colour based on your usage levels:
 
 <p align="center">
-  <img src="README/menubar-safe.png" width="260" alt="Menu bar - Safe usage">
-  <img src="README/menubar-warning.png" width="260" alt="Menu bar - Warning threshold">
-  <img src="README/menubar-critical.png" width="260" alt="Menu bar - Critical threshold">
+  <img src="docs/menubar-safe.png" width="260" alt="Menu bar - Safe usage">
+  <img src="docs/menubar-warning.png" width="260" alt="Menu bar - Warning threshold">
+  <img src="docs/menubar-critical.png" width="260" alt="Menu bar - Critical threshold">
 </p>
 
 When using Sonnet models, an additional indicator shows your Sonnet-specific usage:
 
 <p align="center">
-  <img src="README/menubar-sonnet.png" width="300" alt="Menu bar - Sonnet usage">
+  <img src="docs/menubar-sonnet.png" width="300" alt="Menu bar - Sonnet usage">
 </p>
 
 ### Notifications
@@ -34,20 +34,20 @@ When using Sonnet models, an additional indicator shows your Sonnet-specific usa
 ClaudeMeter sends native macOS notifications when you reach warning or critical thresholds:
 
 <p align="center">
-  <img src="README/notifications.png" width="450" alt="Usage notifications">
+  <img src="docs/notifications.png" width="450" alt="Usage notifications">
 </p>
 
 ### Settings
 
 <p align="center">
-  <img src="README/settings-general.png" width="380" alt="Settings - General">
-  <img src="README/settings-notifications.png" width="380" alt="Settings - Notifications">
+  <img src="docs/settings-general.png" width="380" alt="Settings - General">
+  <img src="docs/settings-notifications.png" width="380" alt="Settings - Notifications">
 </p>
 
 ### Setup Wizard
 
 <p align="center">
-  <img src="README/setup-wizard.png" width="600" alt="First-time setup wizard">
+  <img src="docs/setup-wizard.png" width="600" alt="First-time setup wizard">
 </p>
 
 ## Installation
