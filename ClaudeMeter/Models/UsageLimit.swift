@@ -47,12 +47,11 @@ extension UsageLimit {
         return formatter.localizedString(for: resetAt, relativeTo: Date())
     }
 
-    /// Exact reset time formatted in user's timezone for tooltip display
+    /// Exact reset time formatted in São Paulo timezone (UTC-3)
     var resetTimeFormatted: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        formatter.timeZone = .current
+        formatter.dateFormat = "dd/MM 'às' HH:mm"
+        formatter.timeZone = TimeZone(identifier: "America/Sao_Paulo")
         return formatter.string(from: resetAt)
     }
 

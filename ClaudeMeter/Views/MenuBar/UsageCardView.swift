@@ -68,7 +68,7 @@ struct UsageCardView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "clock")
                         .font(.caption)
-                    Text("Resets \(usageLimit.resetDescription)")
+                    Text("Resets \(usageLimit.resetTimeFormatted)")
                         .font(.caption)
                 }
                 .help(usageLimit.resetTimeFormatted)
